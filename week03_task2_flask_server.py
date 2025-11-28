@@ -1,47 +1,38 @@
+# week03_task2_flask_server.py
+
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-VALID_DIRECTIONS = {"forward", "backward", "left", "right", "stop"}
+# Store the latest command
+latest_command = {"direction": "stop", "speed": 0}
 
 @app.route("/ping", methods=["GET"])
 def ping():
-    return jsonify({"status": "alive"}), 200
-
+    return jsonify({"status": "alive"})
 
 @app.route("/move", methods=["POST"])
 def move():
+    """Streamlit frontend posts a command here"""
+    global latest_command
     data = request.get_json()
 
-    if not data:
-        return jsonify({"error": "No JSON received"}), 400
+    direction = data.get("direction", "stop")
+    speed = int(data.get("speed", 0))
 
-    direction = data.get("direction")
-    speed = data.get("speed")
+    # Constrain speed (0–255)
+    speed = max(0, min(speed, 255))
 
-    # Validate direction
-    if direction not in VALID_DIRECTIONS:
-        return jsonify({"error": "Invalid direction"}), 400
+    latest_command = {"direction": direction, "speed": speed}
+    print(f"[Backend] Received command: {latest_command}")
 
-    # Validate speed
-    try:
-        speed = int(speed)
-    except:
-        return jsonify({"error": "Speed must be an integer"}), 400
+    return jsonify({"status": "ok", "sent": latest_command})
 
-    if speed < 0 or speed > 255:
-        return jsonify({"error": "Speed must be between 0 and 255"}), 400
-
-    # Print to console (simulates sending commands to hardware)
-    print(f"[MOVE] Direction: {direction}, Speed: {speed}")
-
-    return jsonify({
-        "status": "ok",
-        "direction": direction,
-        "speed": speed
-    }), 200
-
+@app.route("/get_command", methods=["GET"])
+def get_command():
+    """Arduino polls this every 5 seconds"""
+    return jsonify(latest_command)
 
 if __name__ == "__main__":
-    # Accessible on local network, helpful for mobile testing
     app.run(host="0.0.0.0", port=5000, debug=True)
+
