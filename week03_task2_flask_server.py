@@ -30,7 +30,7 @@ def move():
         return jsonify({"error": "Speed must be an integer"}), 400
 
     if speed < 0 or speed > 255:
-        return jsonify({"error": "Speed must be between 0 and 10"}), 400
+        return jsonify({"error": "Speed must be between 0 and 255"}), 400
 
     # Print to console (simulates sending commands to hardware)
     print(f"[MOVE] Direction: {direction}, Speed: {speed}")
