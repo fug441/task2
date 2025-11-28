@@ -15,7 +15,7 @@ col1, col2, col3 = st.columns(3)
 
 # Function to send commands
 def send_command(direction, speed):
-    url = "http://127.0.0.1:5000/move"   # Change to your Flask server URL if needed
+    url = "https://task2-t6ko.onrender.com/"   # Change to your Flask server URL if needed
     payload = {"direction": direction, "speed": speed}
 
     try:
