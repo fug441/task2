@@ -9,7 +9,7 @@ st.title("🚗 Remote Vehicle Control Panel")
 speed = st.slider("Speed (0–255)", 0, 255, 120)
 
 # Flask server URL
-SERVER_URL = "https://task2-t6ko.onrender.com/move"  # Change if needed
+SERVER_URL = "http://127.0.0.1:5000/move"  # Change if needed
 
 # Function to send commands to Flask
 def send_command(direction, speed):
