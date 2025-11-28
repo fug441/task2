@@ -1,33 +1,35 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="Robot Controller", page_icon="🤖")
+st.set_page_config(page_title="Remote Vehicle Control", page_icon="🚗")
 
-st.title("🚗 Robot Control Panel")
+st.title("🚗 Remote Vehicle Control Panel")
 
-# --- Speed Slider ---
-speed = st.slider("Speed", 0, 255, 120)
+# --- Speed Slider (0–255 for PWM) ---
+speed = st.slider("Speed (0–255)", 0, 255, 120)
 
-st.write("### Direction Controls")
+# Flask server URL
+SERVER_URL = "https://task2-t6ko.onrender.com/"  # Change if needed
 
-# Layout buttons in a grid
-col1, col2, col3 = st.columns(3)
-
-# Function to send commands
+# Function to send commands to Flask
 def send_command(direction, speed):
-    url = "https://task2-t6ko.onrender.com/"   # Change to your Flask server URL if needed
     payload = {"direction": direction, "speed": speed}
 
     try:
-        res = requests.post(url, json=payload, timeout=3)
-        if res.status_code == 200:
-            st.success(f"Sent: {direction} at speed {speed}")
-        else:
-            st.error(f"Error {res.status_code}: {res.text}")
-    except Exception as e:
-        st.error(f"Failed to send command: {e}")
+        res = requests.post(SERVER_URL, json=payload, timeout=3)
 
-# --- Buttons ---
+        if res.status_code == 200:
+            st.success(f"Sent → {direction.upper()} @ speed {speed}")
+        else:
+            st.error(f"Server error ({res.status_code}): {res.text}")
+
+    except Exception as e:
+        st.error(f"Failed to contact server: {e}")
+
+
+# Layout the control buttons
+st.write("### Movement Controls")
+col1, col2, col3 = st.columns(3)
 
 with col2:
     if st.button("⬆️ Forward"):
@@ -45,7 +47,8 @@ with col2:
     if st.button("⬇️ Backward"):
         send_command("backward", speed)
 
-# Stop button full width
+# STOP button (full width)
 st.write("---")
 if st.button("🛑 STOP", use_container_width=True):
     send_command("stop", 0)
+
