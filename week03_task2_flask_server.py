@@ -7,6 +7,10 @@ app = Flask(__name__)
 # Store the latest command
 latest_command = {"direction": "stop", "speed": 0}
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"status": "Flask server is live"})
+
 @app.route("/ping", methods=["GET"])
 def ping():
     return jsonify({"status": "alive"})
